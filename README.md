@@ -15,6 +15,5 @@
 - WidgetManager를 만들고 UWorldSubsystem를 상속 받아 외부에서 Subsystem을 통해 접근하기 쉽게 구현
 - ActorManager, SoundManager, WidgetManager 등도 똑같이 구현
 - 나이아가라를 활용하여 이펙트 처리, 액터를 만들고 NiagaraComponent를 추가하는 구조로 만들어 이펙트도 ActorManager에서 관리하도록 처리
--
 
-<img width="952" height="540" alt="2026-08-14-16-57-16" src="https://github.com/user-attachments/assets/57377d6f-e6b7-421d-a8fd-1aad08b5259e" />
+<img width="952" height="540" alt="2026-08-14-16-57-16" src="https://github.com/user-attachments/assets/e33feec5-960e-407c-b836-2d23d32e023f" />
