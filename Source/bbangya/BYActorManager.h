@@ -42,6 +42,10 @@ public:
 	void ReturnToPoolAll();
 	void PrepopulatePool(EBYActorType ActorType, int32 Size = 20);
 
+	void SetPlayerRotationAngle(float InMin, float InMax);
+	float GetPlayerRotationAngleMin() { return PlayerRotationAngleMin - 10.f; }
+	float GetPlayerRotationAngleMax() { return PlayerRotationAngleMax + 10.f; }
+
 	ABYActor* GetSpawnedActor(EBYActorType ActorType);
 
 	template<typename T>
@@ -66,4 +70,8 @@ protected:
 
 	UPROPERTY()
 	TMap<EBYActorType, FBYActorPool> ActorPoolMap;
+
+private:
+	float PlayerRotationAngleMin = 0.f;
+	float PlayerRotationAngleMax = 0.f;
 };

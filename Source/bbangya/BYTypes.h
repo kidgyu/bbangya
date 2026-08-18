@@ -10,6 +10,7 @@ enum class EBYGameState : uint8
 {
 	Menu,
 	Ingame,
+	Dying,
 	Result
 };
 
@@ -44,6 +45,7 @@ enum class EBYSFXType : uint8
 	None,
 	Shot,
 	Die,
+	PlayerHurt,
 
 	NextLevel,
 

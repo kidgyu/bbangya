@@ -8,6 +8,7 @@
 
 enum class EBYGameState : uint8;
 class UBYMenuWidget;
+class UBYIngameWidget;
 class UBYResultWidget;
 
 UCLASS()
@@ -22,12 +23,23 @@ public:
 
 	void SetWidgetType(EBYGameState InGameState);
 
+	// Ingame
+	void Ingame_SetGameLevel(int32 InLevel);
+	void Ingame_SetPlayerHp(int32 InPlayerHp);
+	void Ingame_SetKillCount(uint64 InCount);
+	void Ingame_SetExpRatio(float InRatio);
+	void Ingame_SetPlayerAngle(float InCurrentAngle);
+	void Ingame_SetPlayerAngleRange(float InMin, float InMax);
+
 	template <typename T>
 	T* CreateUIWidget(const FString& path);
 
 private:
 	UPROPERTY()
 	TObjectPtr<UBYMenuWidget> CachedMenuWidget;
+
+	UPROPERTY()
+	TObjectPtr<UBYIngameWidget> CachedIngameWidget;
 
 	UPROPERTY()
 	TObjectPtr<UBYResultWidget> CachedResultWidget;

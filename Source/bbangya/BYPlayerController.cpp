@@ -8,6 +8,7 @@
 #include "BYPlayerPawn.h"
 #include "InputMappingContext.h"
 #include "InputAction.h"
+#include "BYWidgetManager.h"
 #include "BYTypes.h"
 
 ABYPlayerController::ABYPlayerController()
@@ -85,8 +86,7 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 		return;
 
 	//월드 서브 시스템에서 액터 매니저를 가져오기
-	UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>();
-	if (AM)
+	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
 	{
 		if (ABYPlayerPawn* PlayerPawn = AM->GetPlayerPawn())
 		{
@@ -94,8 +94,14 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 			FRotator DeltaRotation = FRotator(0.f, YawInput * RotationSpeed, 0.f);
 			FRotator NewRotation = CurrentRotation + DeltaRotation;
 
-			NewRotation.Yaw = FMath::ClampAngle(NewRotation.Yaw, -90.f, 90.f);
+			NewRotation.Yaw = FMath::ClampAngle(NewRotation.Yaw, AM->GetPlayerRotationAngleMin(), AM->GetPlayerRotationAngleMax());
 			PlayerPawn->SetActorRotation(NewRotation);
+
+			if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
+			{
+				float CurrentAngle = static_cast<float>(NewRotation.Yaw);
+				WM->Ingame_SetPlayerAngle(CurrentAngle);
+			}
 		}
 	}
 }

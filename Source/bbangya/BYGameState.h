@@ -30,6 +30,8 @@ protected:
 	void OnAllActorsBeginPlayCompleted();
 
 private:
+	void StartPlay();
+	void PlayerDying();
 	void EndGame();
 
 private:
@@ -39,6 +41,7 @@ private:
 	int32 CurrentGameLevel = 1;
 	int32 NextLevelKillCount = 0;
 	int32 CurrentKillCount = 0;
+	uint64 TotalKillCount = 0;
 
 	// GameLevelSetting - Bullet
 	int32 BulletCount;

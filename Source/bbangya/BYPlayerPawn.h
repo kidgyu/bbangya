@@ -22,6 +22,7 @@ protected:
 
 public:	
 	virtual void Tick(float DeltaTime) override;
+	void InitPlayer();
 	void SetPlayerLevel(int32 InGameLevel, int32 InBulletCount, float InBulletSpeed, float InBulletSpreadAngle, float InFireAttackTime, float InFireDamage);
 	
 private:
@@ -34,6 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void OnDamage(float DamageAmount);
 
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	float GetPlayerHP() { return PlayerHP; }
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
 	void OnPlayIdleAnimation();
 
@@ -42,6 +46,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Animation")
 	void OnPlayDieAnimation(int32 Index);
+
+	UFUNCTION(BlueprintCallable, Category = "Animation")
+	void OnCompleteDieAnimation();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

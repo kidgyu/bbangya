@@ -67,6 +67,8 @@ void UBYActorManager::SpawnPlayerPawn()
 		PC->Possess(PlayerPawn);
 		PC->SetViewTarget(PlayerPawn);
 	}
+
+	PlayerPawn->InitPlayer();
 }
 
 void UBYActorManager::DespawnPlayerPawn()
@@ -164,4 +166,10 @@ void UBYActorManager::SetActiveActor(ABYActor* InActor, bool InActive)
 	InActor->SetActorHiddenInGame(!InActive); // 렌더링
 	InActor->SetActorTickEnabled(InActive); // 업데이트
 	InActor->SetActorEnableCollision(InActive); // 충돌
+}
+
+void UBYActorManager::SetPlayerRotationAngle(float InMin, float InMax)
+{
+	PlayerRotationAngleMin = InMin;
+	PlayerRotationAngleMax = InMax;
 }

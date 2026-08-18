@@ -31,6 +31,9 @@ void ABYEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (IsEnemyDie)
+		return;
+
 	if (TargetPlayer.IsValid())
 	{
 		FVector CurrentLocation = GetActorLocation();
@@ -47,6 +50,16 @@ void ABYEnemyActor::Tick(float DeltaTime)
 			UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>();
 			if (AM)
 			{
+				if (ABYEffectActor* EffectActor = AM->GetSpawnedActor<ABYEffectActor>(EBYActorType::Effect_Die))
+				{
+					EffectActor->PlayEffect(GetActorLocation());
+				}
+
+				if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
+				{
+					SM->PlaySound2D(EBYSFXType::PlayerHurt);
+				}
+
 				AM->ReturnToPool(GetActorType(), this);
 			}
 
@@ -114,6 +127,9 @@ void ABYEnemyActor::SetEnemy(ABYPlayerPawn* Player, int32 InLevel, float InHP, f
 	MoveSpeed	= InMoveSpeed;
 
 	TargetPlayer = Player;
+	IsEnemyDie = false;
+
+	SkeletalMesh->InitializeAnimScriptInstance(true);
 }
 
 void ABYEnemyActor::OnDamage(float DamageAmount)
@@ -140,8 +156,6 @@ void ABYEnemyActor::OnDamage(float DamageAmount)
 
 				EffectActor->PlayEffect(HitPos + (DirToPlayer.GetSafeNormal() * 50.f));
 			}
-
-			AM->ReturnToPool(ActorType, this);
 		}
 
 		if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
@@ -153,5 +167,19 @@ void ABYEnemyActor::OnDamage(float DamageAmount)
 		{
 			GS->OnEnemyDie(EnemyLevel);
 		}
+
+		int32 RandIndex = FMath::RandRange(0, 3);
+		OnPlayDieAnimation(RandIndex);
+
+		SetActorEnableCollision(false); // Ãæµ¹
+		IsEnemyDie = true;
+	}
+}
+
+void ABYEnemyActor::OnCompleteDieAnimation()
+{
+	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
+	{
+		AM->ReturnToPool(ActorType, this);
 	}
 }

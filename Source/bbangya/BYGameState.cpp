@@ -43,6 +43,13 @@ void ABYGameState::Tick(float DeltaTime)
 
 void ABYGameState::OnAllActorsBeginPlayCompleted()
 {
+	UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>();
+
+	if (AM)
+	{
+		AM->SpawnPlayerPawn();
+	}
+
 	SetGameState(EBYGameState::Menu);
 }
 
@@ -62,17 +69,12 @@ void ABYGameState::SetGameState(EBYGameState InGameState)
 		break;
 	case EBYGameState::Ingame:
 		{
-			if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
-			{
-				AM->SpawnPlayerPawn();
-			}
-
-			if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
-			{
-				SM->PlayBGM(EBYBGMType::Ingame, 2.f);
-			}
-
-			SetGameLevelSetting(1);
+			StartPlay();
+		}
+		break;
+	case EBYGameState::Dying:
+		{
+			PlayerDying();
 		}
 		break;
 	case EBYGameState::Result:
@@ -133,7 +135,32 @@ void ABYGameState::SpawnEnemyInFanShape()
 	}
 }
 
-void ABYGameState::EndGame()
+void ABYGameState::StartPlay()
+{
+	UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>();
+
+	if (!AM)
+		return;
+
+	AM->SpawnPlayerPawn();
+
+	TotalKillCount = 0;
+	SetGameLevelSetting(1);
+
+	if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
+	{
+		float PlayerHp = AM->GetPlayerPawn()->GetPlayerHP();
+		WM->Ingame_SetPlayerHp(static_cast<int32>(PlayerHp));
+		WM->Ingame_SetKillCount(TotalKillCount);
+	}
+
+	if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
+	{
+		SM->PlayBGM(EBYBGMType::Ingame, 2.f);
+	}
+}
+
+void ABYGameState::PlayerDying()
 {
 	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
 	{
@@ -149,6 +176,10 @@ void ABYGameState::EndGame()
 	}
 }
 
+void ABYGameState::EndGame()
+{
+}
+
 void ABYGameState::OnEnemyDie(int32 InEnemyLevel)
 {
 	int CurrentLevel = CurrentGameLevel;
@@ -156,10 +187,20 @@ void ABYGameState::OnEnemyDie(int32 InEnemyLevel)
 		return;
 
 	CurrentKillCount += 1;
+	TotalKillCount += 1;
 
 	if (CurrentKillCount >= NextLevelKillCount)
 	{
 		SetGameLevelSetting(CurrentGameLevel + 1);
+	}
+
+	if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
+	{
+		float Ratio = 1.f;
+		if (NextLevelKillCount != 0)
+			Ratio = CurrentKillCount / static_cast<float>(NextLevelKillCount);
+		WM->Ingame_SetExpRatio(Ratio);
+		WM->Ingame_SetKillCount(TotalKillCount);
 	}
 }
 
@@ -196,9 +237,29 @@ void ABYGameState::SetGameLevelSetting(int32 InLevel)
 
 	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
 	{
+		AM->SetPlayerRotationAngle(EnemySpawnAngle_Min, EnemySpawnAngle_Max);
+
 		if (ABYPlayerPawn* PlayerPawn = AM->GetPlayerPawn())
 		{
 			PlayerPawn->SetPlayerLevel(CurrentGameLevel, BulletCount, BulletSpeed, BulletSpreadAngle, FireAttackTime, FireDamage);
+		}
+	}
+
+	if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
+	{
+		WM->Ingame_SetGameLevel(CurrentGameLevel);
+		WM->Ingame_SetExpRatio(0.f);
+		float StartAngle = EnemySpawnAngle_Min + 180.f;
+		float EndAngle = EnemySpawnAngle_Max + 180.f;
+
+		WM->Ingame_SetPlayerAngleRange(StartAngle, EndAngle);
+	}
+
+	if (CurrentGameLevel != 1)
+	{
+		if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
+		{
+			SM->PlaySound2D(EBYSFXType::NextLevel);
 		}
 	}
 }

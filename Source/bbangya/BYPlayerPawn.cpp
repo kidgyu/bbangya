@@ -11,6 +11,7 @@
 #include "BYActorManager.h"
 #include "BYSoundManager.h"
 #include "BYBulletActor.h"
+#include "BYWidgetManager.h"
 #include "BYTypes.h"
 
 ABYPlayerPawn::ABYPlayerPawn()
@@ -35,8 +36,6 @@ ABYPlayerPawn::ABYPlayerPawn()
 
 	NS_Burst = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NSSmoke"));
 	NS_Burst->SetupAttachment(Weapon);
-	FName ParameterName = TEXT("User.Scale");
-	NS_Burst->SetFloatParameter(ParameterName, 0.3f);
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
@@ -87,6 +86,14 @@ void ABYPlayerPawn::Tick(float DeltaTime)
 		ElapsedTime -= CurrentFireTime;
 		FireBullet();
 	}
+}
+
+void ABYPlayerPawn::InitPlayer()
+{
+	IsPlayerDie = false;
+	SkeletalMesh->InitializeAnimScriptInstance(true);
+	PlayerHP = 100.f;
+	NS_Burst->Deactivate();
 }
 
 void ABYPlayerPawn::SetPlayerLevel(int32 InGameLevel, int32 InBulletCount, float InBulletSpeed, float InBulletSpreadAngle, float InFireAttackTime, float InFireDamage)
@@ -196,10 +203,20 @@ void ABYPlayerPawn::OnDamage(float DamageAmount)
 	PlayerHP = FMath::Max(PlayerHP - DamageAmount, 0.f);
 	if (FMath::IsNearlyZero(PlayerHP))
 	{
-		GameState->SetGameState(EBYGameState::Result);
+		GameState->SetGameState(EBYGameState::Dying);
 		IsPlayerDie = true;
 
 		int32 RandIndex = FMath::RandRange(0, 3);
 		OnPlayDieAnimation(RandIndex);
 	}
+
+	if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
+	{
+		WM->Ingame_SetPlayerHp(static_cast<int32>(PlayerHP));
+	}
+}
+
+void ABYPlayerPawn::OnCompleteDieAnimation()
+{
+	GameState->SetGameState(EBYGameState::Result);
 }
