@@ -45,6 +45,7 @@ public:
 	void SetPlayerRotationAngle(float InMin, float InMax);
 	float GetPlayerRotationAngleMin() { return PlayerRotationAngleMin - 10.f; }
 	float GetPlayerRotationAngleMax() { return PlayerRotationAngleMax + 10.f; }
+	FVector GetPlayerLocation();
 
 	ABYActor* GetSpawnedActor(EBYActorType ActorType);
 

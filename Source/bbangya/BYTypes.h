@@ -23,9 +23,12 @@ enum class EBYActorType : uint8
 	Enemy4,
 	Enemy5,
 
+	Bomb,
 	Bullet,
+
 	Effect_Hit,
 	Effect_Die,
+	Effect_Explosion,
 
 	MAX
 };
@@ -48,7 +51,11 @@ enum class EBYSFXType : uint8
 	PlayerHurt,
 
 	NextLevel,
+	Explode,
+	Throw,
 
 	GameOver_Voice,
-	GameOver_BGM
+	GameOver_BGM,
+
+	Button
 };

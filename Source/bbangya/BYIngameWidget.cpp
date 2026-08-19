@@ -4,6 +4,39 @@
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
 #include "Components/RadialSlider.h"
+#include "BYGameState.h"
+#include "BYActorManager.h"
+#include "BYSoundManager.h"
+#include "BYBombActor.h"
+#include "BYTypes.h"
+
+void UBYIngameWidget::OnClick_Bomb()
+{
+	UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>();
+	if (!AM)
+		return;
+
+	ABYBombActor* Bomb = AM->GetSpawnedActor<ABYBombActor>(EBYActorType::Bomb);
+	if (!Bomb)
+		return;
+
+	FVector StartPosition = AM->GetPlayerLocation();
+	StartPosition.Z += 30.f;
+	StartPosition.Y += 30.f;
+
+	float RandAngle = FMath::RandRange(AM->GetPlayerRotationAngleMin() + 15.f, AM->GetPlayerRotationAngleMax() - 15.f);
+	
+	FRotator RotationOffset = FRotator(0.f, RandAngle, 0.f);
+	FVector RotatedDirection = RotationOffset.RotateVector(FVector::ForwardVector);
+	FVector FinalDirection = RotatedDirection.GetSafeNormal();
+
+	Bomb->LaunchBomb(StartPosition, FinalDirection);
+
+	if (UBYSoundManager* SM = GetWorld()->GetSubsystem<UBYSoundManager>())
+	{
+		SM->PlaySound2D(EBYSFXType::Throw);
+	}
+}
 
 void UBYIngameWidget::SetGameLevel(int32 InLevel)
 {

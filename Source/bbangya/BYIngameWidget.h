@@ -14,6 +14,10 @@ UCLASS()
 class BBANGYA_API UBYIngameWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Button")
+	void OnClick_Bomb();
 	
 public:
 	UPROPERTY(meta = (BindWidget))

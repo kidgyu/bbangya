@@ -157,7 +157,11 @@ void UBYActorManager::PreLoadActorPool()
 	{
 		EBYActorType Type = (EBYActorType)i;
 
-		PrepopulatePool(Type, 200);
+		int32 Size = 200;
+		if (Type == EBYActorType::Bomb)
+			Size = 20;
+
+		PrepopulatePool(Type, Size);
 	}
 }
 
@@ -172,4 +176,12 @@ void UBYActorManager::SetPlayerRotationAngle(float InMin, float InMax)
 {
 	PlayerRotationAngleMin = InMin;
 	PlayerRotationAngleMax = InMax;
+}
+
+FVector UBYActorManager::GetPlayerLocation()
+{
+	if (PlayerPawn)
+		return PlayerPawn->GetActorLocation();
+
+	return FVector::ZeroVector;
 }

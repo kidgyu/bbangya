@@ -94,8 +94,14 @@ void UBYSoundManager::PlaySound2D(EBYSFXType SFXType, float VolumeMultiplier)
 	if (SFXType == EBYSFXType::None)
 		return;
 
-	/*if (IsPlayingSound2D(SFXType))
-		return;*/
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (float* LastPlayTimePtr = LastPlayTimeMap.Find(SFXType))
+	{
+		const float SoundCooldown = 0.08f;
+
+		if (CurrentTime - *LastPlayTimePtr < SoundCooldown)
+			return;
+	}
 
 	if (TObjectPtr<USoundBase>* FoundSound = LoadedSFXMap.Find(SFXType))
 	{
@@ -111,6 +117,11 @@ void UBYSoundManager::PlaySound2D(EBYSFXType SFXType, float VolumeMultiplier)
 
 				ActiveSFXCompoents.Add(SFXType, AudioComp);
 			}
+
+			if (LastPlayTimeMap.Contains(SFXType))
+				LastPlayTimeMap[SFXType] = CurrentTime;
+			else
+				LastPlayTimeMap.Add(SFXType, CurrentTime);
 		}
 	}
 }

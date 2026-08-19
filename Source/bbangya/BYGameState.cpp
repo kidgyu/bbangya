@@ -183,16 +183,20 @@ void ABYGameState::EndGame()
 void ABYGameState::OnEnemyDie(int32 InEnemyLevel)
 {
 	int CurrentLevel = CurrentGameLevel;
-	if (CurrentLevel == 0 || CurrentLevel != InEnemyLevel || NextLevelKillCount == 0)
+	if (CurrentLevel == 0 || CurrentLevel != InEnemyLevel)
 		return;
 
-	CurrentKillCount += 1;
-	TotalKillCount += 1;
-
-	if (CurrentKillCount >= NextLevelKillCount)
+	if (NextLevelKillCount != 0)
 	{
-		SetGameLevelSetting(CurrentGameLevel + 1);
+		CurrentKillCount += 1;
+
+		if (CurrentKillCount >= NextLevelKillCount)
+		{
+			SetGameLevelSetting(CurrentGameLevel + 1);
+		}
 	}
+
+	TotalKillCount += 1;
 
 	if (UBYWidgetManager* WM = GetWorld()->GetSubsystem<UBYWidgetManager>())
 	{

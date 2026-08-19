@@ -44,4 +44,6 @@ private:
 
 	UPROPERTY()
 	TMap<EBYSFXType, TWeakObjectPtr<UAudioComponent>> ActiveSFXCompoents;
+
+	TMap<EBYSFXType, float> LastPlayTimeMap;
 };
