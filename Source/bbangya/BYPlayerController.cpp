@@ -96,12 +96,15 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 			CalculatedYawInput = CurrentTouchPos.X - LastTouchPosition.X;
 			LastTouchPosition = CurrentTouchPos;
 		}
+
+		RotationSpeed = 0.15f;
 	}
 	else
 	{
 		bIsTouchDragging = false;
 		FVector2D LookAxisVector = Value.Get<FVector2D>();
 		CalculatedYawInput = LookAxisVector.X;
+		RotationSpeed = 2.f;
 	}
 
 	//월드 서브 시스템에서 액터 매니저를 가져오기
