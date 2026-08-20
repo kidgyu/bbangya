@@ -79,7 +79,7 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	// 좌,우 드래그(X축 이동) 값만 사용
-	float YawInput = LookAxisVector.X;
+	float YawInput = LookAxisVector.X * 0.1f;
 
 	// 회전 값이 없으면 무시
 	if (FMath::IsNearlyZero(YawInput))
