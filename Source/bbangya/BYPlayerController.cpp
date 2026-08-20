@@ -76,14 +76,33 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 			return;
 	}
 
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	float CalculatedYawInput = 0.f;
 
-	// 좌,우 드래그(X축 이동) 값만 사용
-	float YawInput = LookAxisVector.X;
+	bool bIsCurrentlyTouching = false;
+	float CurrentTouchX = 0.f;
+	float CurrentTouchY = 0.f;
+	GetInputTouchState(ETouchIndex::Touch1, CurrentTouchX, CurrentTouchY, bIsCurrentlyTouching);
 
-	// 회전 값이 없으면 무시
-	if (FMath::IsNearlyZero(YawInput))
-		return;
+	if (bIsCurrentlyTouching)
+	{
+		FVector2D CurrentTouchPos(CurrentTouchX, CurrentTouchY);
+		if (!bIsTouchDragging)
+		{
+			bIsTouchDragging = true;
+			LastTouchPosition = CurrentTouchPos;
+		}
+		else
+		{
+			CalculatedYawInput = CurrentTouchPos.X - LastTouchPosition.X;
+			LastTouchPosition = CurrentTouchPos;
+		}
+	}
+	else
+	{
+		bIsTouchDragging = false;
+		FVector2D LookAxisVector = Value.Get<FVector2D>();
+		CalculatedYawInput = LookAxisVector.X;
+	}
 
 	//월드 서브 시스템에서 액터 매니저를 가져오기
 	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
@@ -91,7 +110,7 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 		if (ABYPlayerPawn* PlayerPawn = AM->GetPlayerPawn())
 		{
 			FRotator CurrentRotation = PlayerPawn->GetActorRotation();
-			FRotator DeltaRotation = FRotator(0.f, YawInput * RotationSpeed, 0.f);
+			FRotator DeltaRotation = FRotator(0.f, CalculatedYawInput * RotationSpeed, 0.f);
 			FRotator NewRotation = CurrentRotation + DeltaRotation;
 
 			NewRotation.Yaw = FMath::ClampAngle(NewRotation.Yaw, AM->GetPlayerRotationAngleMin(), AM->GetPlayerRotationAngleMax());

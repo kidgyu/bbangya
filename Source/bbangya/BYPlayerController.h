@@ -22,6 +22,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	void LookRotation(const FInputActionValue& Value);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
@@ -37,5 +38,6 @@ public:
 	TObjectPtr<ABYGameState> GameState;
 
 protected:
-	void LookRotation(const FInputActionValue& Value);
+	bool bIsTouchDragging = false;
+	FVector2D LastTouchPosition;
 };
