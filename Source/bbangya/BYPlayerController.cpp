@@ -79,11 +79,13 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	// 좌,우 드래그(X축 이동) 값만 사용
-	float YawInput = LookAxisVector.X * 0.1f;
+	float YawInput = LookAxisVector.X;
 
 	// 회전 값이 없으면 무시
 	if (FMath::IsNearlyZero(YawInput))
 		return;
+
+	float FinalSensitivity = 0.15f;
 
 	//월드 서브 시스템에서 액터 매니저를 가져오기
 	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
@@ -91,7 +93,7 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 		if (ABYPlayerPawn* PlayerPawn = AM->GetPlayerPawn())
 		{
 			FRotator CurrentRotation = PlayerPawn->GetActorRotation();
-			FRotator DeltaRotation = FRotator(0.f, YawInput * RotationSpeed, 0.f);
+			FRotator DeltaRotation = FRotator(0.f, YawInput * RotationSpeed * FinalSensitivity, 0.f);
 			FRotator NewRotation = CurrentRotation + DeltaRotation;
 
 			NewRotation.Yaw = FMath::ClampAngle(NewRotation.Yaw, AM->GetPlayerRotationAngleMin(), AM->GetPlayerRotationAngleMax());
