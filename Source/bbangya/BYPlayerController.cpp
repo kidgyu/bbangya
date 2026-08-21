@@ -107,6 +107,9 @@ void ABYPlayerController::LookRotation(const FInputActionValue& Value)
 		RotationSpeed = 2.f;
 	}
 
+	if (FMath::IsNearlyZero(CalculatedYawInput))
+		return;
+
 	//월드 서브 시스템에서 액터 매니저를 가져오기
 	if (UBYActorManager* AM = GetWorld()->GetSubsystem<UBYActorManager>())
 	{
